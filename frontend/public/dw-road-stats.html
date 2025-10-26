@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Road Stats</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<h1>Road Statistics</h1>
+<canvas id="roadChart" width="800" height="400"></canvas>
+
+<script>
+fetch('http://127.0.0.1:5000/dwm/api/road-agg')
+  .then(res => res.json())
+  .then(data => {
+    const labels = data.map(r => r.road_name + ' (' + r.city + ')');
+    const counts = data.map(r => r.total_potholes);
+
+    const ctx = document.getElementById('roadChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Total Potholes',
+          data: counts,
+          backgroundColor: 'rgba(75, 192, 192, 0.7)'
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { x: { ticks: { autoSkip: false } } }
+      }
+    });
+  });
+</script>
+</body>
+</html>

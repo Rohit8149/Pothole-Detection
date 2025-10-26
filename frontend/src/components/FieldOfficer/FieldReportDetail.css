@@ -1,0 +1,22 @@
+/* Field Officer Report Detail Styles */
+.role-detail-page { min-height: 100vh; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); display:flex; flex-direction:column; }
+.role-header { background:#fff; border-bottom:1px solid #e0e0e0; display:flex; justify-content:space-between; align-items:center; padding:12px 20px; }
+.role-brand { display:flex; align-items:center; gap:10px; color:#ff6600; font-weight:700; }
+.role-brand img { width:32px; height:32px; }
+.role-back { background: linear-gradient(135deg, #1a4ed8 0%, #103fba 100%); color:#fff; padding:8px 12px; border-radius:8px; text-decoration:none; }
+.role-detail-content { max-width: 1000px; margin: 0 auto; padding: 30px 20px; width: 100%; }
+.role-detail-card { background:#fff; border-radius:12px; padding:20px; box-shadow:0 8px 25px rgba(0,0,0,0.1); }
+.role-detail-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+.role-badge { color:#fff; padding:6px 12px; border-radius:20px; font-weight:700; }
+.role-badge.pending { background:#ff9800; }
+.role-badge.work-ordered { background:#2196f3; }
+.role-badge.in-progress { background:#9c27b0; }
+.role-badge.completed { background:#4caf50; }
+.role-detail-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:16px; }
+.role-detail-section { background: #f8f9ff; border-radius:8px; padding:14px; }
+.role-detail-section h3 { color:#333; margin-bottom:8px; }
+.role-detail-section p { color:#666; }
+.role-detail-actions { display:flex; gap:10px; margin-top:16px; }
+.role-detail-actions button { background: linear-gradient(135deg, #ff6600 0%, #e65c00 100%); color:#fff; border:none; padding:10px 16px; border-radius:8px; cursor:pointer; font-weight:600; }
+.role-footer { text-align:center; padding: 20px; color:#95a5a6; margin-top:auto; }
+@media (max-width:480px){ .role-detail-actions { flex-direction:column; } }

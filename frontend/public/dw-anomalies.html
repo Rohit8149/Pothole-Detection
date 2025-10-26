@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Anomalies</title>
+</head>
+<body>
+<h1>Repair Time Anomalies</h1>
+<table border="1" cellpadding="5">
+  <thead>
+    <tr>
+      <th>Report ID</th>
+      <th>Repair Time</th>
+      <th>Severity</th>
+      <th>Officer</th>
+      <th>Location</th>
+    </tr>
+  </thead>
+  <tbody id="anomalyTable"></tbody>
+</table>
+
+<script>
+fetch('http://127.0.0.1:5000/dwm/api/anomalies')
+  .then(res => res.json())
+  .then(data => {
+    const tbody = document.getElementById('anomalyTable');
+    data.forEach(a => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${a.reportid}</td>
+                      <td>${a.repairtime}</td>
+                      <td>${a.severity || ''}</td>
+                      <td>${a.officerid || ''}</td>
+                      <td>${a.locationid || ''}</td>`;
+      tbody.appendChild(tr);
+    });
+  });
+</script>
+</body>
+</html>

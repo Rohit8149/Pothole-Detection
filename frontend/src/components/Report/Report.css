@@ -1,0 +1,143 @@
+.report-page {
+  display: flex;
+  justify-content:flex-start;
+  align-items: center;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f0f2f5;
+  gap: 10px;
+}
+
+.report-form-container {
+  width: 100%;
+  max-width: 450px;
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.report-form-container h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.upload-area {
+  border: 2px dashed #bbb;
+  padding: 40px;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: border-color 0.3s ease;
+}
+
+.upload-area:hover {
+  border-color: #4caf50;
+}
+
+.image-preview {
+  width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  cursor: pointer;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.location-btn {
+  padding: 8px 12px;
+  cursor: pointer;
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  transition: background 0.3s ease;
+}
+
+.location-btn:hover {
+  background: #125ca1;
+}
+
+.submit-btn {
+  background: #4caf50;
+  color: white;
+  padding: 12px;
+  width: 100%;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s ease;
+}
+
+.submit-btn:hover {
+  background: #3d8b40;
+}
+
+.submitted-view {
+  text-align: center;
+  position: relative;
+  width: 100%;
+  max-width: 700px;
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.submitted-view h2 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.full-image {
+  width: 100%;
+  max-height: 500px;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  margin-top: 15px;
+}
+
+.close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 18px;
+  background: #f0f0f0; /* light gray */
+  color: #333; /* dark gray X */
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.close-btn:hover {
+  background: #e0e0e0; /* darker gray on hover */
+  transform: scale(1.1);
+}
+
+
+
+.location-text {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #555;
+  background: #f9f9f9;
+  padding: 6px 10px;
+  border-radius: 6px;
+  display: inline-block;
+}

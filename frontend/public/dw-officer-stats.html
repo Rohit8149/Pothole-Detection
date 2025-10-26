@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Officer Stats</title>
+</head>
+<body>
+<h1>Officer Performance</h1>
+<table id="officerTable">
+  <thead>
+    <tr>
+      <th>Officer Name</th>
+      <th>Total Reports</th>
+      <th>Average Repair Time (hrs)</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+fetch('http://127.0.0.1:5000/dwm/api/officer-stats')
+  .then(res => res.json())
+  .then(data => {
+    const tbody = document.querySelector("#officerTable tbody");
+    tbody.innerHTML = "";
+
+    data.forEach(o => {
+      const tr = document.createElement("tr");
+
+      // Officer name
+      const tdName = document.createElement("td");
+      tdName.innerText = o.name || "-";
+      tr.appendChild(tdName);
+
+      // Total reports
+      const tdTotal = document.createElement("td");
+      tdTotal.innerText = o.total_reports || 0;
+      tr.appendChild(tdTotal);
+
+      // Average repair time — safe formatting
+      const tdAvg = document.createElement("td");
+      const avgRepair = typeof o.avg_repair_hours === "number" ? o.avg_repair_hours : 0;
+      tdAvg.innerText = avgRepair.toFixed(2);
+      tr.appendChild(tdAvg);
+
+      tbody.appendChild(tr);
+    });
+  })
+  .catch(err => console.error(err));
+</script>
+Notes:
+</body>
+</html>
