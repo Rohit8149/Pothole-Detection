@@ -1,0 +1,14 @@
+path: C:/Users/rohit/OneDrive/Desktop/WDL LAB/model_api/Pothole-Detection--1
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 1
+names: ['pothole']
+
+roboflow:
+  workspace: project-yjhi5
+  project: pothole-detection-bqu6s-dwjbo
+  version: 1
+  license: MIT
+  url: https://universe.roboflow.com/project-yjhi5/pothole-detection-bqu6s-dwjbo/dataset/1
