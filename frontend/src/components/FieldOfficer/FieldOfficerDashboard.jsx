@@ -1,15 +1,37 @@
 import React, { useEffect, useState, useMemo } from "react";
-import "./FieldOfficerDashboard.css";
 import { useNavigate } from "react-router-dom";
 import {
-  getFieldOfficerReports,
-  updateReportStatus,
-} from "../../services/roleApi";
+  Container,
+  Box,
+  Typography,
+  Tabs,
+  Tab,
+  Grid,
+  Card,
+  CardContent,
+  CardActions,
+  Button,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  CircularProgress,
+  Divider,
+} from "@mui/material";
+import { getFieldOfficerReports, updateReportStatus } from "../../services/roleApi";
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
+import DoneAllIcon from '@mui/icons-material/DoneAll';
 
 const statusColors = {
-  assigned: "#ff9800",
-  "in-progress": "#9c27b0",
-  completed: "#4caf50",
+  assigned: "warning",
+  "in-progress": "secondary",
+  completed: "success",
 };
 
 const statusLabels = {
@@ -25,46 +47,27 @@ const FieldOfficerDashboard = () => {
   const [activeTab, setActiveTab] = useState("assigned");
   const [severityFilter, setSeverityFilter] = useState("");
   const [updatingId, setUpdatingId] = useState(null);
-
-  // NEW: overlay state
   const [selectedReport, setSelectedReport] = useState(null);
 
   const token = localStorage.getItem("token");
-  const user = (() => {
-    try {
-      return JSON.parse(localStorage.getItem("user") || "{}");
-    } catch {
-      return {};
-    }
-  })();
 
   useEffect(() => {
-    if (!token) {
-      navigate("/");
-      return;
-    }
     const fetchData = async () => {
       try {
         setLoading(true);
         const data = await getFieldOfficerReports(token);
-        console.log(data);
-        // setReports(Array.isArray(data.reports) ? data.reports : []);
         const sortedReports = Array.isArray(data.reports)
-          ? data.reports.sort(
-              (a, b) => new Date(b.report?.date) - new Date(a.report?.date)
-            )
+          ? data.reports.sort((a, b) => new Date(b.report?.date) - new Date(a.report?.date))
           : [];
         setReports(sortedReports);
-
-        setLoading(false);
       } catch (err) {
         console.error("Failed to fetch reports:", err);
         setReports([]);
+      } finally {
         setLoading(false);
       }
     };
     fetchData();
-    
   }, [navigate, token]);
 
   const handleStatusChange = async (assignmentId, nextStatus) => {
@@ -74,21 +77,13 @@ const FieldOfficerDashboard = () => {
       const res = await updateReportStatus(assignmentId, nextStatus, token);
       const updatedAssignment = res.assignment;
 
-      if (!updatedAssignment) {
-        console.error("Backend did not return assignment");
-        setUpdatingId(null);
-        return;
+      if (updatedAssignment) {
+        setReports((prev) => prev.map((r) => r._id === updatedAssignment._id ? updatedAssignment : r));
+        setActiveTab(updatedAssignment.status);
       }
-
-      setReports((prev) =>
-        prev.map((r) =>
-          r._id === updatedAssignment._id ? updatedAssignment : r
-        )
-      );
-      setActiveTab(updatedAssignment.status);
-      setUpdatingId(null);
     } catch (err) {
       console.error("Failed to update status:", err);
+    } finally {
       setUpdatingId(null);
     }
   };
@@ -102,190 +97,152 @@ const FieldOfficerDashboard = () => {
   }, [reports, activeTab, severityFilter]);
 
   return (
-    <div className="role-dashboard-page">
-      {/* ... header and hero unchanged ... */}
-      <header className="role-header">
-        {" "}
-        <div className="role-brand">
-          {" "}
-          <img src="/pothole-logo.svg" alt="PotholeDetect Logo" />{" "}
-          <span>PotholeDetect</span>{" "}
-        </div>{" "}
-        <div className="role-user">
-          {" "}
-          <span>{user?.name || "Field Officer"}</span>{" "}
-          <button
-            onClick={() => {
-              localStorage.removeItem("token");
-              localStorage.removeItem("user");
-              navigate("/");
-            }}
-          >
-            Logout
-          </button>{" "}
-        </div>{" "}
-      </header>{" "}
-      <section className="role-hero">
-        {" "}
-        <div className="role-hero-content">
-          {" "}
-          <h1>Assigned Reports</h1>{" "}
-          <p>Manage and update the status of pothole reports in your area</p>{" "}
-        </div>{" "}
-      </section>
-      <main className="role-content">
-        {/* Tabs */}
-        <div className="role-tabs">
-          {["assigned", "in-progress", "completed"].map((status) => (
-            <button
-              key={status}
-              className={`role-tab ${activeTab === status ? "active" : ""}`}
-              onClick={() => {
-                setActiveTab(status);
-                setSeverityFilter("");
-              }}
-            >
-              {statusLabels[status]} (
-              {reports.filter((r) => r.status === status).length})
-            </button>
-          ))}
-        </div>
+    <Container maxWidth="xl" sx={{ py: 4 }}>
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" fontWeight={700} gutterBottom>
+          Assigned Reports
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          Manage and update the status of pothole reports in your designated area.
+        </Typography>
+      </Box>
 
-        {/* Severity Filter */}
-        <div className="role-controls">
-          <label>Filter by Severity: </label>
-          <select
-            className="role-select"
+      {/* Tabs */}
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+        <Tabs 
+          value={activeTab} 
+          onChange={(e, val) => { setActiveTab(val); setSeverityFilter(""); }}
+          variant="scrollable"
+          scrollButtons="auto"
+        >
+          <Tab icon={<AssignmentIcon />} iconPosition="start" label={`Assigned (${reports.filter(r => r.status === 'assigned').length})`} value="assigned" />
+          <Tab icon={<AutorenewIcon />} iconPosition="start" label={`In Progress (${reports.filter(r => r.status === 'in-progress').length})`} value="in-progress" />
+          <Tab icon={<DoneAllIcon />} iconPosition="start" label={`Completed (${reports.filter(r => r.status === 'completed').length})`} value="completed" />
+        </Tabs>
+      </Box>
+
+      {/* Controls */}
+      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'flex-end' }}>
+        <FormControl size="small" sx={{ minWidth: 200 }}>
+          <InputLabel>Filter by Severity</InputLabel>
+          <Select
             value={severityFilter}
+            label="Filter by Severity"
             onChange={(e) => setSeverityFilter(e.target.value)}
           >
-            <option value="">All</option>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-            <option value="critical">Critical</option>
-          </select>
-        </div>
+            <MenuItem value="">All</MenuItem>
+            <MenuItem value="low">Low</MenuItem>
+            <MenuItem value="medium">Medium</MenuItem>
+            <MenuItem value="high">High</MenuItem>
+            <MenuItem value="critical">Critical</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
 
-        <div className="role-grid">
-          {loading && <div className="role-loading">Loading reports…</div>}
-          {!loading && tabReports.length === 0 && (
-            <div className="role-empty">No reports in this section.</div>
-          )}
-          {!loading &&
-            tabReports.map((r) => (
-              <div key={r._id} className="role-card">
-                <div className="role-card-header">
-                  <span className="role-report-id">
-                    {r.report?.reportId || r._id}
-                  </span>
-                  <span
-                    className="role-status"
-                    style={{
-                      backgroundColor: statusColors[r.status] || "#757575",
-                    }}
-                  >
-                    {statusLabels[r.status] || r.status}
-                  </span>
-                </div>
-                <div className="role-card-body">
-                  <h3 className="role-location">
-                    {r.report?.location?.address || "Location"}
-                  </h3>
-                  <p className="role-meta">
+      {/* Grid */}
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+          <CircularProgress />
+        </Box>
+      ) : tabReports.length === 0 ? (
+        <Box sx={{ textAlign: 'center', py: 8 }}>
+          <Typography variant="body1" color="text.secondary">No reports found in this section.</Typography>
+        </Box>
+      ) : (
+        <Grid container spacing={3}>
+          {tabReports.map((r) => (
+            <Grid item xs={12} sm={6} md={4} key={r._id}>
+              <Card variant="outlined" sx={{ borderRadius: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                <CardContent sx={{ flexGrow: 1 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                    <Typography variant="caption" sx={{ fontFamily: 'monospace', bgcolor: 'action.hover', px: 1, py: 0.5, borderRadius: 1 }}>
+                      {r.report?.reportId || r._id.substring(0, 8)}
+                    </Typography>
+                    <Chip label={statusLabels[r.status] || r.status} color={statusColors[r.status] || "default"} size="small" />
+                  </Box>
+                  <Typography variant="h6" fontWeight={600} gutterBottom sx={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    {r.report?.location?.address || "Unknown Location"}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ textTransform: 'capitalize' }}>
                     Severity: {r.report?.severity || "NA"}
-                  </p>
-                  <p className="role-meta">
-                    Date:{" "}
-                    {r.report?.date
-                      ? new Date(r.report.date).toLocaleDateString()
-                      : "—"}
-                  </p>
-                </div>
-                <div className="role-card-actions">
-                  {/* Instead of <Link>, open overlay */}
-                  <button
-                    className="role-btn-outline"
-                    onClick={() => setSelectedReport(r)}
-                  >
+                  </Typography>
+                  <Typography variant="caption" color="text.disabled">
+                    Date: {r.report?.date ? new Date(r.report.date).toLocaleDateString() : "—"}
+                  </Typography>
+                </CardContent>
+                <Divider />
+                <CardActions sx={{ p: 2, display: 'flex', justifyContent: 'space-between', gap: 1, flexWrap: 'wrap' }}>
+                  <Button size="small" variant="outlined" onClick={() => setSelectedReport(r)}>
                     Details
-                  </button>
-                  <select
-                    className="role-select"
-                    disabled={updatingId === r._id}
-                    value=""
-                    onChange={(e) => handleStatusChange(r._id, e.target.value)}
-                  >
-                    <option value="" disabled>
-                      Update Status
-                    </option>
-                    {r.status !== "in-progress" && (
-                      <option value="in-progress">In Progress</option>
-                    )}
-                    {r.status !== "completed" && (
-                      <option value="completed">Completed</option>
-                    )}
-                  </select>
-                </div>
-              </div>
-            ))}
-        </div>
-      </main>
-      <footer className="role-footer">
-        <p>© 2025 PotholeDetect</p>
-      </footer>
-      {/* 🔹 Overlay Modal */}
-      {/* 🔹 Overlay Modal */}
-      {selectedReport && (
-        <div className="report-overlay">
-          <div className="report-overlay-content">
-            <button
-              className="report-close-btn"
-              onClick={() => setSelectedReport(null)}
-            >
-              ✖
-            </button>
-
-            <h2>Report Details</h2>
-            <div className="report-detail-row">
-              <strong>ID:</strong> {selectedReport.report?.reportId}
-            </div>
-            <div className="report-detail-row">
-              <strong>Description:</strong>{" "}
-              {selectedReport.report?.description || "—"}
-            </div>
-            <div className="report-detail-row">
-              <strong>Severity:</strong>{" "}
-              {selectedReport.report?.severity || "—"}
-            </div>
-            <div className="report-detail-row">
-              <strong>Status:</strong> {selectedReport.report?.status || "—"}
-            </div>
-            <div className="report-detail-row">
-              <strong>Address:</strong>{" "}
-              {selectedReport.report?.location?.address || "—"}
-            </div>
-            <div className="report-detail-row">
-              <strong>Latitude:</strong>{" "}
-              {selectedReport.report?.location?.lat || "—"}
-            </div>
-            <div className="report-detail-row">
-              <strong>Longitude:</strong>{" "}
-              {selectedReport.report?.location?.lng || "—"}
-            </div>
-
-            {/* Image at bottom */}
-            {selectedReport.report?.imageUrl && (
-              <img
-                src={`http://localhost:5000${selectedReport.report.imageUrl}`}
-                alt="report"
-                className="report-image"
-              />
-            )}
-          </div>
-        </div>
+                  </Button>
+                  <FormControl size="small" sx={{ minWidth: 140 }}>
+                    <Select
+                      value=""
+                      displayEmpty
+                      disabled={updatingId === r._id}
+                      onChange={(e) => handleStatusChange(r._id, e.target.value)}
+                    >
+                      <MenuItem value="" disabled>Update Status</MenuItem>
+                      {r.status !== "in-progress" && <MenuItem value="in-progress">In Progress</MenuItem>}
+                      {r.status !== "completed" && <MenuItem value="completed">Completed</MenuItem>}
+                    </Select>
+                  </FormControl>
+                </CardActions>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
       )}
-    </div>
+
+      {/* Detail Dialog */}
+      <Dialog open={!!selectedReport} onClose={() => setSelectedReport(null)} maxWidth="sm" fullWidth>
+        {selectedReport && (
+          <>
+            <DialogTitle sx={{ fontWeight: 700 }}>
+              Report Details
+            </DialogTitle>
+            <DialogContent dividers>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="caption" color="text.secondary" display="block">Report ID</Typography>
+                  <Typography variant="body1" fontWeight={500} gutterBottom>{selectedReport.report?.reportId}</Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="caption" color="text.secondary" display="block">Status</Typography>
+                  <Chip label={statusLabels[selectedReport.report?.status] || selectedReport.report?.status || "—"} color="primary" size="small" sx={{ mt: 0.5 }} />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="caption" color="text.secondary" display="block">Severity</Typography>
+                  <Typography variant="body1" fontWeight={500} gutterBottom sx={{ textTransform: 'capitalize' }}>{selectedReport.report?.severity || "—"}</Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography variant="caption" color="text.secondary" display="block">Address</Typography>
+                  <Typography variant="body1" fontWeight={500} gutterBottom>{selectedReport.report?.location?.address || "—"}</Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography variant="caption" color="text.secondary" display="block">Description</Typography>
+                  <Typography variant="body1" fontWeight={500} gutterBottom>{selectedReport.report?.description || "—"}</Typography>
+                </Grid>
+                {selectedReport.report?.imageUrl && (
+                  <Grid item xs={12} sx={{ mt: 2 }}>
+                    <Typography variant="caption" color="text.secondary" display="block" gutterBottom>Uploaded Image</Typography>
+                    <Box 
+                      component="img" 
+                      src={`http://localhost:5000${selectedReport.report.imageUrl}`} 
+                      alt="Pothole" 
+                      sx={{ width: '100%', borderRadius: 2 }}
+                    />
+                  </Grid>
+                )}
+              </Grid>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setSelectedReport(null)} variant="contained">Close</Button>
+            </DialogActions>
+          </>
+        )}
+      </Dialog>
+    </Container>
   );
 };
 

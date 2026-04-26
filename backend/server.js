@@ -1,8 +1,8 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
-const dotenv = require('dotenv');
 const path = require('path');
 const assignmentRoutes = require('./routes/assignments');
 const supervisorRoutes = require("./routes/supervisor");
@@ -20,9 +20,9 @@ const dashboardRoutes = require("./routes/dashboard");
 
 const app = express();
 
-const allowedOrigins = ["http://localhost:3000", "http://127.0.0.1:3000"];
+const allowedOrigins = ["http://localhost:5173", "http://127.0.0.1:5173"];
 
-dotenv.config();
+
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {

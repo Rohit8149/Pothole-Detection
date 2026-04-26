@@ -31,36 +31,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="footer">
-        <div className="footer-content">
-          <div className="footer-section">
-            <div className="logo">
-              <img src="/pothole-logo.svg" alt="PotholeDetect Logo" />
-              <span>PotholeDetect</span>
-            </div>
-            <p>Making roads safer with smart technology.</p>
-          </div>
-          <div className="footer-section">
-            <h3>Quick Links</h3>
-            <ul>
-              <li><a href="/home">Home</a></li>
-              <li><a href="/report">Report Pothole</a></li>
-              <li><a href="/about">About Us</a></li>
-              <li><a href="/contact">Contact</a></li>
-            </ul>
-          </div>
-          <div className="footer-section">
-            <h3>Contact Info</h3>
-            <p>📧 info@potholedetect.com</p>
-            <p>📞 +1 (555) 123-4567</p>
-            <p>📍 123 Tech Street, City</p>
-          </div>
-        </div>
-        <div className="footer-bottom">
-          <p>&copy; 2025 PotholeDetect. All rights reserved.</p>
-        </div>
-      </footer>
     </div>
   );
 };

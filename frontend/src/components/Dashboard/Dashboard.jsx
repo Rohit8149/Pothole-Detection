@@ -1,546 +1,448 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import "./Dashboard.css";
-import Navbar from "../navbar/Navbar.jsx";
-import { useNavigate } from "react-router-dom";
+import {
+  Container,
+  Box,
+  Typography,
+  Tabs,
+  Tab,
+  Grid,
+  Card,
+  CardContent,
+  CardActions,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Chip,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Avatar,
+  Divider,
+} from "@mui/material";
+import { alpha } from "@mui/material/styles";
+
+// Icons
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import MapIcon from '@mui/icons-material/Map';
+import TimelineIcon from '@mui/icons-material/Timeline';
+import PendingActionsIcon from '@mui/icons-material/PendingActions';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import BuildIcon from '@mui/icons-material/Build';
+import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
+import TravelExploreIcon from '@mui/icons-material/TravelExplore';
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [userData, setUserData] = useState({ stats: {}, reports: [] });
   const [statusFilter, setStatusFilter] = useState("");
   const [priorityFilter, setPriorityFilter] = useState("");
-  const [userDetails, setUserDetails] = useState(null)
-  // let userDetails;
-  // Mock data - in real app this would come from API
-  // const userStats = {
-  //   totalReports: 23,
-  //   pendingReports: 5,
-  //   verifiedReports: 15,
-  //   completedRepairs: 3,
-  // };
-
-  const recentReports = [
-    {
-      id: "PH-001",
-      location: "Main St & 5th Ave",
-      status: "Verified",
-      severity: "High",
-      date: "2024-01-15",
-      priority: "urgent",
-    },
-    {
-      id: "PH-002",
-      location: "Oak Road near Park",
-      status: "Pending",
-      severity: "Medium",
-      date: "2024-01-14",
-      priority: "medium",
-    },
-    {
-      id: "PH-003",
-      location: "Highway 101 Exit 12",
-      status: "In Progress",
-      severity: "High",
-      date: "2024-01-13",
-      priority: "high",
-    },
-    {
-      id: "PH-004",
-      location: "Elm Street School Zone",
-      status: "Completed",
-      severity: "Low",
-      date: "2024-01-12",
-      priority: "low",
-    },
-    {
-      id: "PH-005",
-      location: "Downtown Bridge",
-      status: "Verified",
-      severity: "Critical",
-      date: "2024-01-11",
-      priority: "urgent",
-    },
-  ];
+  const [userDetails, setUserDetails] = useState(null);
 
   const getStatusColor = (status) => {
-    switch (status) {
+    switch (status?.toLowerCase()) {
       case "pending":
-        return "#ff9800";
+        return "warning";
       case "verified":
-        return "#2196f3";
-      case "In Progress":
-        return "#9c27b0";
+        return "info";
+      case "in progress":
+        return "secondary";
       case "completed":
-        return "#4caf50";
+        return "success";
       default:
-        return "#757575";
+        return "default";
     }
   };
 
   const getPriorityIcon = (priority) => {
-    switch (priority) {
-      case "critical":
-        return "🔴";
-      case "high":
-        return "🟠";
-      case "medium":
-        return "🟡";
-      case "low":
-        return "🟢";
-      default:
-        return "⚪";
+    switch (priority?.toLowerCase()) {
+      case "critical": return "🔴";
+      case "high": return "🟠";
+      case "medium": return "🟡";
+      case "low": return "🟢";
+      default: return "⚪";
     }
   };
-  const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(!localStorage.getItem("login"));
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUserDetails(parsedUser); // ✅ update state
-      console.log("User loaded:", parsedUser);
+    const token = localStorage.getItem('token');
+    const name = localStorage.getItem('name');
+    if (name) {
+      setUserDetails({ name });
     }
-    if (!localStorage.getItem("login")) {
-      navigate("/");
-    }
+
     const fetchDashboardData = async () => {
       try {
-        const getData = async () => {
-          console.log("Fetching user data...");
-          console.log("User ID:", localStorage.getItem("user"));
-          const user = JSON.parse(localStorage.getItem("user"));
-
-          const data = await fetch(
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        if (user.id && token) {
+          const response = await fetch(
             `http://localhost:5000/api/getdata/dashboard/${user.id}`,
-            {
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
+            { headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` } }
           );
-          if (data.status === 200) {
-            console.log("Data fetched successfully");
-            const response = await data.json();
-            console.log("User Data:", response);
-            setUserData(response);
-            // Update state with user-specific data
+          if (response.ok) {
+            const data = await response.json();
+            setUserData(data);
           }
-        };
-        getData();
+        }
       } catch (err) {
         console.error("Error fetching dashboard data:", err);
       }
     };
     fetchDashboardData();
-  }, [navigate]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run once on mount
+
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
+
   return (
-    <div className="dashboard-page">
-      <Navbar />
-
+    <Container maxWidth="xl" sx={{ py: 4 }}>
       {/* Dashboard Header */}
-      <div className="dashboard-header">
-        <div className="header-content">
-          <div className="welcome-section">
-            <h1>Welcome back, {userDetails?.name || 'User'}!</h1>
-            <p>Here's your pothole reporting dashboard</p>
-          </div>
-          <div className="header-actions">
-            <Link to="/report" className="btn-primary">
-              <span>📸</span> Report New Pothole
-            </Link>
-          </div>
-        </div>
-      </div>
+      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+        <Box>
+          <Typography variant="h4" fontWeight={700} gutterBottom>
+            Welcome back, {userDetails?.name || 'User'}!
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Here's your pothole reporting dashboard overview.
+          </Typography>
+        </Box>
+        <Button 
+          variant="contained" 
+          component={Link} 
+          to="/report"
+          startIcon={<AddAPhotoIcon />}
+          size="large"
+          sx={{ borderRadius: 2 }}
+        >
+          Report New Pothole
+        </Button>
+      </Box>
 
-      {/* Dashboard Navigation */}
-      <div className="dashboard-nav">
-        <div className="nav-container">
-          {[
-            { key: "overview", label: "Overview", icon: "📊" },
-            { key: "reports", label: "My Reports", icon: "📋" },
-            { key: "map", label: "Map View", icon: "🗺️" },
-            { key: "analytics", label: "Analytics", icon: "📈" },
-          ].map((tab) => (
-            <button
-              key={tab.key}
-              className={`nav-tab ${activeTab === tab.key ? "active" : ""}`}
-              onClick={() => setActiveTab(tab.key)}
-            >
-              {tab.icon} {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* Tabs */}
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 4 }}>
+        <Tabs value={activeTab} onChange={handleTabChange} aria-label="dashboard tabs" variant="scrollable" scrollButtons="auto">
+          <Tab icon={<AssessmentIcon />} iconPosition="start" label="Overview" value="overview" />
+          <Tab icon={<AssignmentIcon />} iconPosition="start" label="My Reports" value="reports" />
+          <Tab icon={<MapIcon />} iconPosition="start" label="Map View" value="map" />
+          <Tab icon={<TimelineIcon />} iconPosition="start" label="Analytics" value="analytics" />
+        </Tabs>
+      </Box>
 
-      {/* Dashboard Content */}
-      <div className="dashboard-content">
-        {activeTab === "overview" && (
-          <div className="overview-section">
-            {/* Stats Cards */}
-            <div className="stats-grid">
-              <div className="stat-card total">
-                <div className="stat-icon">📊</div>
-                <div className="stat-info">
-                  <h3>{userData?.stats.totalReports || 0}</h3>
-                  <p>Total Reports</p>
-                </div>
-              </div>
-              <div className="stat-card pending">
-                <div className="stat-icon">⏳</div>
-                <div className="stat-info">
-                  <h3>{userData?.stats.pendingReports || 0}</h3>
-                  <p>Pending Review</p>
-                </div>
-              </div>
-              <div className="stat-card verified">
-                <div className="stat-icon">✅</div>
-                <div className="stat-info">
-                  <h3>{userData?.stats.verifiedReports || 0}</h3>
-                  <p>Verified</p>
-                </div>
-              </div>
-              <div className="stat-card completed">
-                <div className="stat-icon">🏁</div>
-                <div className="stat-info">
-                  <h3>{userData?.stats.completedReports || 0}</h3>
-                  <p>Repairs Completed</p>
-                </div>
-              </div>
-            </div>
+      {/* Overview Tab */}
+      {activeTab === "overview" && (
+        <Box>
+          {/* Stats Grid */}
+          <Grid container spacing={3} mb={4}>
+            <Grid item xs={12} sm={6} md={3}>
+              <Card variant="outlined" sx={{ borderRadius: 3, bgcolor: (theme) => alpha(theme.palette.primary.main, 0.05) }}>
+                <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <Avatar sx={{ bgcolor: 'primary.main', width: 56, height: 56 }}><AssessmentIcon fontSize="large" /></Avatar>
+                  <Box>
+                    <Typography variant="h4" fontWeight={700}>{userData?.stats?.totalReports || 0}</Typography>
+                    <Typography variant="body2" color="text.secondary" fontWeight={500}>Total Reports</Typography>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Card variant="outlined" sx={{ borderRadius: 3, bgcolor: (theme) => alpha(theme.palette.warning.main, 0.05) }}>
+                <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <Avatar sx={{ bgcolor: 'warning.main', width: 56, height: 56 }}><PendingActionsIcon fontSize="large" /></Avatar>
+                  <Box>
+                    <Typography variant="h4" fontWeight={700}>{userData?.stats?.pendingReports || 0}</Typography>
+                    <Typography variant="body2" color="text.secondary" fontWeight={500}>Pending Review</Typography>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Card variant="outlined" sx={{ borderRadius: 3, bgcolor: (theme) => alpha(theme.palette.info.main, 0.05) }}>
+                <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <Avatar sx={{ bgcolor: 'info.main', width: 56, height: 56 }}><CheckCircleIcon fontSize="large" /></Avatar>
+                  <Box>
+                    <Typography variant="h4" fontWeight={700}>{userData?.stats?.verifiedReports || 0}</Typography>
+                    <Typography variant="body2" color="text.secondary" fontWeight={500}>Verified</Typography>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Card variant="outlined" sx={{ borderRadius: 3, bgcolor: (theme) => alpha(theme.palette.success.main, 0.05) }}>
+                <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <Avatar sx={{ bgcolor: 'success.main', width: 56, height: 56 }}><BuildIcon fontSize="large" /></Avatar>
+                  <Box>
+                    <Typography variant="h4" fontWeight={700}>{userData?.stats?.completedReports || 0}</Typography>
+                    <Typography variant="body2" color="text.secondary" fontWeight={500}>Repairs Completed</Typography>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
 
+          <Grid container spacing={4}>
             {/* Recent Activity */}
-            <div className="recent-activity">
-              <h2>Recent Reports</h2>
-              <div className="reports-table">
-                <div className="table-header">
-                  <span>Report ID</span>
-                  <span>Location</span>
-                  <span>Status</span>
-                  <span>Priority</span>
-                  <span>Date</span>
-                </div>
-
-                {(userData?.reports || [])
-                  .slice() // copy to avoid mutating state
-                  .sort((a, b) => new Date(b.date) - new Date(a.date)) // sort by newest first
-                  .slice(0, 5) // take only top 5
-                  .map((report) => (
-                    <div key={report._id} className="table-row">
-                      <span className="report-id">{report.reportId}</span>
-                      <span className="location">
-                        {report?.location?.address || report?.location || "N/A"}
-                      </span>
-                      <span
-                        className="status-badge"
-                        style={{
-                          backgroundColor: getStatusColor(report.status),
-                        }}
-                      >
-                        {report.status}
-                      </span>
-                      <span className="priority">
-                        {getPriorityIcon(report.severity)} {report.severity}
-                      </span>
-                      <span className="date">
-                        {report.date
-                          ? new Date(report.date).toLocaleDateString()
-                          : "N/A"}
-                      </span>
-                    </div>
-                  ))}
-              </div>
-            </div>
+            <Grid item xs={12} md={8}>
+              <Card variant="outlined" sx={{ borderRadius: 3, height: '100%' }}>
+                <CardContent>
+                  <Typography variant="h6" fontWeight={700} gutterBottom>Recent Reports</Typography>
+                  <TableContainer component={Box} sx={{ mt: 2 }}>
+                    <Table size="small" aria-label="recent reports table">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell sx={{ fontWeight: 600 }}>Report ID</TableCell>
+                          <TableCell sx={{ fontWeight: 600 }}>Location</TableCell>
+                          <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
+                          <TableCell sx={{ fontWeight: 600 }}>Priority</TableCell>
+                          <TableCell sx={{ fontWeight: 600 }}>Date</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {(userData?.reports || [])
+                          .slice()
+                          .sort((a, b) => new Date(b.date) - new Date(a.date))
+                          .slice(0, 5)
+                          .map((report) => (
+                            <TableRow key={report._id} hover>
+                              <TableCell sx={{ fontFamily: 'monospace' }}>{report.reportId || report._id.substring(0,8)}</TableCell>
+                              <TableCell>{report?.location?.address || report?.location || "N/A"}</TableCell>
+                              <TableCell>
+                                <Chip label={report.status} color={getStatusColor(report.status)} size="small" />
+                              </TableCell>
+                              <TableCell>{getPriorityIcon(report.severity)} {report.severity}</TableCell>
+                              <TableCell>{report.date ? new Date(report.date).toLocaleDateString() : "N/A"}</TableCell>
+                            </TableRow>
+                          ))}
+                        {(!userData?.reports || userData.reports.length === 0) && (
+                           <TableRow>
+                             <TableCell colSpan={5} align="center" sx={{ py: 3, color: 'text.secondary' }}>No recent reports found.</TableCell>
+                           </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </CardContent>
+              </Card>
+            </Grid>
 
             {/* Quick Actions */}
-            <div className="quick-actions">
-              <h2>Quick Actions</h2>
-              <div className="actions-grid">
-                <div className="action-card">
-                  <div className="action-icon">📸</div>
-                  <h3>Report Pothole</h3>
-                  <p>Submit a new pothole report with photos and location</p>
-                  <Link to="/report" className="action-btn">
-                    Start Report
-                  </Link>
-                </div>
-                <div className="action-card">
-                  <div className="action-icon">📍</div>
-                  <h3>View Map</h3>
-                  <p>See all reported potholes in your area on the map</p>
-                  <button
-                    className="action-btn"
-                    onClick={() => setActiveTab("map")}
-                  >
-                    Open Map
-                  </button>
-                </div>
-                <div className="action-card">
-                  <div className="action-icon">📈</div>
-                  <h3>View Analytics</h3>
-                  <p>Check detailed analytics of your reporting activity</p>
-                  <button
-                    className="action-btn"
-                    onClick={() => setActiveTab("analytics")}
-                  >
-                    View Stats
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+            <Grid item xs={12} md={4}>
+              <Card variant="outlined" sx={{ borderRadius: 3, height: '100%' }}>
+                <CardContent>
+                  <Typography variant="h6" fontWeight={700} gutterBottom>Quick Actions</Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+                    <Button 
+                      variant="outlined" 
+                      fullWidth 
+                      startIcon={<AddAPhotoIcon />}
+                      component={Link}
+                      to="/report"
+                      sx={{ justifyContent: 'flex-start', py: 1.5 }}
+                    >
+                      Report Pothole
+                    </Button>
+                    <Button 
+                      variant="outlined" 
+                      fullWidth 
+                      startIcon={<TravelExploreIcon />}
+                      onClick={() => setActiveTab('map')}
+                      sx={{ justifyContent: 'flex-start', py: 1.5 }}
+                    >
+                      View Map
+                    </Button>
+                    <Button 
+                      variant="outlined" 
+                      fullWidth 
+                      startIcon={<TimelineIcon />}
+                      onClick={() => setActiveTab('analytics')}
+                      sx={{ justifyContent: 'flex-start', py: 1.5 }}
+                    >
+                      View Analytics
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+        </Box>
+      )}
 
-        {activeTab === "reports" && (
-          <div className="reports-section">
-            <div className="section-header">
-              <h2>My Reports</h2>
-              <div className="filter-options">
-                <select
-                  className="filter-select"
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                >
-                  <option value="">All Status</option>
-                  <option value="Pending">Pending</option>
-                  <option value="Verified">Verified</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Completed">Completed</option>
-                </select>
-                <select
-                  className="filter-select"
-                  value={priorityFilter}
-                  onChange={(e) => setPriorityFilter(e.target.value)}
-                >
-                  <option value="">All Priority</option>
-                  <option value="Critical">Critical</option>
-                  <option value="High">High</option>
-                  <option value="Medium">Medium</option>
-                  <option value="Low">Low</option>
-                </select>
-              </div>
-            </div>
+      {/* Reports Tab */}
+      {activeTab === "reports" && (
+        <Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
+            <Typography variant="h6" fontWeight={700}>My Reports</Typography>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <FormControl size="small" sx={{ minWidth: 150 }}>
+                <InputLabel>Status</InputLabel>
+                <Select value={statusFilter} label="Status" onChange={(e) => setStatusFilter(e.target.value)}>
+                  <MenuItem value="">All</MenuItem>
+                  <MenuItem value="pending">Pending</MenuItem>
+                  <MenuItem value="verified">Verified</MenuItem>
+                  <MenuItem value="in progress">In Progress</MenuItem>
+                  <MenuItem value="completed">Completed</MenuItem>
+                </Select>
+              </FormControl>
+              <FormControl size="small" sx={{ minWidth: 150 }}>
+                <InputLabel>Priority</InputLabel>
+                <Select value={priorityFilter} label="Priority" onChange={(e) => setPriorityFilter(e.target.value)}>
+                  <MenuItem value="">All</MenuItem>
+                  <MenuItem value="critical">Critical</MenuItem>
+                  <MenuItem value="high">High</MenuItem>
+                  <MenuItem value="medium">Medium</MenuItem>
+                  <MenuItem value="low">Low</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+          </Box>
 
-            <div className="reports-grid">
-              {(userData?.reports || [])
-                .filter(
-                  (report) =>
-                    (statusFilter ? report.status === statusFilter : true) &&
-                    (priorityFilter
-                      ? report.priority.toLowerCase() ===
-                        priorityFilter.toLowerCase()
-                      : true)
-                )
-                .map((report) => (
-                  <div key={report._id} className="report-card">
-                    <div className="report-header">
-                      <span className="report-id">{report._id}</span>
-                      <span
-                        className="status-badge"
-                        style={{
-                          backgroundColor: getStatusColor(report.status),
-                        }}
-                      >
-                        {report.status}
-                      </span>
-                    </div>
-                    <div className="report-info">
-                      <h3>{report.location}</h3>
-                      <p>
-                        Severity: {getPriorityIcon(report.priority)}{" "}
-                        {report.severity}
-                      </p>
-                      <p>Reported: {report.date}</p>
-                    </div>
-                    <div className="report-actions">
-                      <button className="btn-outline">View Details</button>
-                      <button className="btn-primary">Track Progress</button>
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </div>
-        )}
+          <Grid container spacing={3}>
+            {(userData?.reports || [])
+              .filter(report => (statusFilter ? report.status?.toLowerCase() === statusFilter : true))
+              .filter(report => (priorityFilter ? report.severity?.toLowerCase() === priorityFilter : true))
+              .map((report) => (
+                <Grid item xs={12} sm={6} md={4} key={report._id}>
+                  <Card variant="outlined" sx={{ borderRadius: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                    <CardContent sx={{ flexGrow: 1 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                        <Typography variant="caption" sx={{ fontFamily: 'monospace', bgcolor: 'action.hover', px: 1, py: 0.5, borderRadius: 1 }}>
+                          {report._id.substring(0, 10)}...
+                        </Typography>
+                        <Chip label={report.status} color={getStatusColor(report.status)} size="small" />
+                      </Box>
+                      <Typography variant="h6" fontWeight={600} gutterBottom sx={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        {report.location?.address || report.location || "Unknown Location"}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" mb={1}>
+                        Severity: {getPriorityIcon(report.severity)} <span style={{ textTransform: 'capitalize' }}>{report.severity}</span>
+                      </Typography>
+                      <Typography variant="caption" color="text.disabled">
+                        Reported: {report.date ? new Date(report.date).toLocaleDateString() : 'N/A'}
+                      </Typography>
+                    </CardContent>
+                    <Divider />
+                    <CardActions sx={{ p: 2 }}>
+                      <Button size="small" variant="text">View Details</Button>
+                      <Button size="small" variant="contained" sx={{ ml: 'auto' }}>Track Progress</Button>
+                    </CardActions>
+                  </Card>
+                </Grid>
+              ))}
+            {userData?.reports?.length === 0 && (
+              <Grid item xs={12}>
+                <Typography variant="body1" color="text.secondary" align="center" sx={{ py: 8 }}>
+                  You haven't submitted any reports yet.
+                </Typography>
+              </Grid>
+            )}
+          </Grid>
+        </Box>
+      )}
 
-        {activeTab === "map" && (
-          <div className="map-section">
-            <div className="section-header">
-              <h2>Pothole Map</h2>
-              <div className="map-controls">
-                <button className="map-btn active">My Reports</button>
-                <button className="map-btn">All Reports</button>
-                <button className="map-btn">Completed</button>
-              </div>
-            </div>
+      {/* Map Tab */}
+      {activeTab === "map" && (
+        <Card variant="outlined" sx={{ borderRadius: 3 }}>
+          <CardContent sx={{ p: 0 }}>
+            <Box sx={{ p: 3, borderBottom: 1, borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="h6" fontWeight={700}>Pothole Map</Typography>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button variant="contained" size="small">My Reports</Button>
+                <Button variant="outlined" size="small">All Reports</Button>
+                <Button variant="outlined" size="small">Completed</Button>
+              </Box>
+            </Box>
+            <Box sx={{ height: 500, bgcolor: 'action.hover', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 4, textAlign: 'center' }}>
+               <MapIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
+               <Typography variant="h5" color="text.secondary" gutterBottom>Interactive Map Placeholder</Typography>
+               <Typography variant="body1" color="text.secondary" maxWidth={500}>
+                 In a real implementation, a map component (like react-leaflet or Google Maps) would render here, showing pins for all report locations.
+               </Typography>
+            </Box>
+          </CardContent>
+        </Card>
+      )}
 
-            <div className="map-container">
-              <div className="map-placeholder">
-                <div className="map-content">
-                  <div className="map-icon">🗺️</div>
-                  <h3>Interactive Map</h3>
-                  <p>View all pothole reports on an interactive map</p>
-                  <div className="map-legend">
-                    <div className="legend-item">
-                      <span className="legend-dot urgent"></span>
-                      <span>Critical/Urgent</span>
-                    </div>
-                    <div className="legend-item">
-                      <span className="legend-dot high"></span>
-                      <span>High Priority</span>
-                    </div>
-                    <div className="legend-item">
-                      <span className="legend-dot medium"></span>
-                      <span>Medium Priority</span>
-                    </div>
-                    <div className="legend-item">
-                      <span className="legend-dot low"></span>
-                      <span>Low Priority</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+      {/* Analytics Tab */}
+      {activeTab === "analytics" && (
+        <Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Typography variant="h6" fontWeight={700}>Analytics & Insights</Typography>
+            <FormControl size="small" sx={{ minWidth: 150 }}>
+              <InputLabel>Time Range</InputLabel>
+              <Select value="30days" label="Time Range">
+                <MenuItem value="30days">Last 30 Days</MenuItem>
+                <MenuItem value="3months">Last 3 Months</MenuItem>
+                <MenuItem value="1year">Last Year</MenuItem>
+                <MenuItem value="all">All Time</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
 
-        {activeTab === "analytics" && (
-          <div className="analytics-section">
-            <div className="section-header">
-              <h2>Analytics & Insights</h2>
-              <div className="time-filter">
-                <select className="filter-select">
-                  <option>Last 30 Days</option>
-                  <option>Last 3 Months</option>
-                  <option>Last Year</option>
-                  <option>All Time</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="analytics-grid">
-              <div className="chart-card">
-                <h3>Reports Over Time</h3>
-                <div className="chart-placeholder">
-                  <div className="chart-bars">
-                    <div className="bar" style={{ height: "60%" }}></div>
-                    <div className="bar" style={{ height: "80%" }}></div>
-                    <div className="bar" style={{ height: "45%" }}></div>
-                    <div className="bar" style={{ height: "90%" }}></div>
-                    <div className="bar" style={{ height: "70%" }}></div>
-                    <div className="bar" style={{ height: "65%" }}></div>
-                    <div className="bar" style={{ height: "85%" }}></div>
-                  </div>
-                  <p>Weekly reporting activity</p>
-                </div>
-              </div>
-
-              <div className="chart-card">
-                <h3>Status Distribution</h3>
-                <div className="chart-placeholder">
-                  <div className="pie-chart">
-                    <div
-                      className="pie-slice pending"
-                      style={{ transform: "rotate(0deg)" }}
-                    ></div>
-                    <div
-                      className="pie-slice verified"
-                      style={{ transform: "rotate(90deg)" }}
-                    ></div>
-                    <div
-                      className="pie-slice progress"
-                      style={{ transform: "rotate(180deg)" }}
-                    ></div>
-                    <div
-                      className="pie-slice completed"
-                      style={{ transform: "rotate(270deg)" }}
-                    ></div>
-                  </div>
-                  <div className="pie-legend">
-                    <div className="legend-item">
-                      <span className="legend-dot pending"></span>
-                      <span>Pending (22%)</span>
-                    </div>
-                    <div className="legend-item">
-                      <span className="legend-dot verified"></span>
-                      <span>Verified (65%)</span>
-                    </div>
-                    <div className="legend-item">
-                      <span className="legend-dot progress"></span>
-                      <span>In Progress (10%)</span>
-                    </div>
-                    <div className="legend-item">
-                      <span className="legend-dot completed"></span>
-                      <span>Completed (3%)</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="chart-card full-width">
-                <h3>Impact Summary</h3>
-                <div className="impact-stats">
-                  <div className="impact-item">
-                    <div className="impact-number">156</div>
-                    <div className="impact-label">Citizens Helped</div>
-                  </div>
-                  <div className="impact-item">
-                    <div className="impact-number">23</div>
-                    <div className="impact-label">Roads Improved</div>
-                  </div>
-                  <div className="impact-item">
-                    <div className="impact-number">89%</div>
-                    <div className="impact-label">Accuracy Rate</div>
-                  </div>
-                  <div className="impact-item">
-                    <div className="impact-number">4.8</div>
-                    <div className="impact-label">Average Rating</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Footer */}
-      <footer className="footer">
-        <div className="footer-content">
-          <div className="footer-section">
-            <div className="logo">
-              <img src="/pothole-logo.svg" alt="PotholeDetect Logo" />
-              <span>PotholeDetect</span>
-            </div>
-            <p>Making roads safer with smart technology.</p>
-          </div>
-          <div className="footer-section">
-            <h3>Quick Links</h3>
-            <ul>
-              <li>
-                <a href="/home">Home</a>
-              </li>
-              <li>
-                <a href="/report">Report Pothole</a>
-              </li>
-              <li>
-                <a href="/about">About Us</a>
-              </li>
-              <li>
-                <a href="/contact">Contact</a>
-              </li>
-            </ul>
-          </div>
-          <div className="footer-section">
-            <h3>Contact Info</h3>
-            <p>📧 info@potholedetect.com</p>
-            <p>📞 +1 (555) 123-4567</p>
-            <p>📍 123 Tech Street, City</p>
-          </div>
-        </div>
-        <div className="footer-bottom">
-          <p>&copy; 2025 PotholeDetect. All rights reserved.</p>
-        </div>
-      </footer>
-    </div>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <Card variant="outlined" sx={{ borderRadius: 3, height: 400, display: 'flex', flexDirection: 'column' }}>
+                <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                  <Typography variant="subtitle1" fontWeight={600} gutterBottom>Reports Over Time</Typography>
+                  <Box sx={{ flexGrow: 1, bgcolor: 'action.hover', borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 1 }}>
+                    <Typography color="text.secondary">Chart Placeholder</Typography>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Card variant="outlined" sx={{ borderRadius: 3, height: 400, display: 'flex', flexDirection: 'column' }}>
+                <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                  <Typography variant="subtitle1" fontWeight={600} gutterBottom>Status Distribution</Typography>
+                  <Box sx={{ flexGrow: 1, bgcolor: 'action.hover', borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 1 }}>
+                    <Typography color="text.secondary">Pie Chart Placeholder</Typography>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12}>
+              <Card variant="outlined" sx={{ borderRadius: 3 }}>
+                <CardContent>
+                  <Typography variant="subtitle1" fontWeight={600} gutterBottom>Impact Summary</Typography>
+                  <Grid container spacing={2} sx={{ mt: 1 }}>
+                    <Grid item xs={6} sm={3}>
+                      <Box sx={{ textAlign: 'center', p: 2, bgcolor: 'action.hover', borderRadius: 2 }}>
+                        <Typography variant="h4" fontWeight={700} color="primary.main">156</Typography>
+                        <Typography variant="body2" color="text.secondary">Citizens Helped</Typography>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={6} sm={3}>
+                      <Box sx={{ textAlign: 'center', p: 2, bgcolor: 'action.hover', borderRadius: 2 }}>
+                        <Typography variant="h4" fontWeight={700} color="success.main">23</Typography>
+                        <Typography variant="body2" color="text.secondary">Roads Improved</Typography>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={6} sm={3}>
+                      <Box sx={{ textAlign: 'center', p: 2, bgcolor: 'action.hover', borderRadius: 2 }}>
+                        <Typography variant="h4" fontWeight={700} color="info.main">89%</Typography>
+                        <Typography variant="body2" color="text.secondary">Accuracy Rate</Typography>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={6} sm={3}>
+                      <Box sx={{ textAlign: 'center', p: 2, bgcolor: 'action.hover', borderRadius: 2 }}>
+                        <Typography variant="h4" fontWeight={700} color="warning.main">4.8</Typography>
+                        <Typography variant="body2" color="text.secondary">Average Rating</Typography>
+                      </Box>
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+        </Box>
+      )}
+    </Container>
   );
 };
 

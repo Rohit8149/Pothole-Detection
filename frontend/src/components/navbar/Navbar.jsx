@@ -32,12 +32,6 @@ const Navbar = () => {
           <li className={location.pathname === '/report' ? 'active' : ''}>
             <Link to="/report">Report Pothole</Link>
           </li>
-          <li className={location.pathname === '/about' ? 'active' : ''}>
-            <Link to="/about">About Us</Link>
-          </li>
-          <li className={location.pathname === '/contact' ? 'active' : ''}>
-            <Link to="/contact">Contact Us</Link>
-          </li>
         </ul>
 
         {/* Auth Button Section */}
