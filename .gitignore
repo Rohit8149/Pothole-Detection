@@ -13,6 +13,7 @@ __pycache__/
 *.pyc
 *.pyo
 model_api/__pycache__/
+model-api/yolov12/
 
 # Build outputs
 dist/

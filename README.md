@@ -44,6 +44,11 @@ python -m venv venv
 venv\Scripts\activate
 ```
 
+3. Download the YOLOv12 repository (required dependency):
+```bash
+git clone https://github.com/sunsmarterjie/yolov12.git
+```
+
 **macOS/Linux:**
 ```bash
 python3 -m venv venv
