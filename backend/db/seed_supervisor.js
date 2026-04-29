@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/User'); // Adjust path if needed
 require('dotenv').config();
 
-const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://rohitthatikonda:Rohit123@cluster0.gsf4e.mongodb.net/Pothole_Detection";
+const MONGO_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/Pothole_Detection";
 
 // MongoDB connection
 mongoose.connect(MONGO_URI, {

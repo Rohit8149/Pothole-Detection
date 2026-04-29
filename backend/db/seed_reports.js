@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Report = require('../models/Reports'); // adjust path
 const User = require('../models/User');
 
-const MONGO_URI = "mongodb+srv://rohitthatikonda:Rohit123@cluster0.gsf4e.mongodb.net/Pothole_Detection";
+const MONGO_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/Pothole_Detection";
 
 mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("MongoDB connected"))
