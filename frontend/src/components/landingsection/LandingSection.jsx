@@ -6,12 +6,19 @@ const LandingSection = () => {
   return (
     <>
       {/* Hero Section */}
-      <section className="hero">
-        <h1>Smart Pothole Detection System</h1>
-        <p>Report potholes with AI-powered verification, automatic location tracking, and priority-based assignment to ensure safer roads for everyone.</p>
-        <div className="hero-buttons">
-          <Link to="/report" className="orange-btn">📸 Report a Pothole</Link>
-          <Link to="/dashboard" className="outline-btn">View Dashboard</Link>
+      <section className="hero-container">
+        <div className="hero-content">
+          <div className="hero-left">
+            <h1>Smart Road Analysis &amp; Pothole Detection</h1>
+            <p>Report potholes with AI-powered verification, automatic location tracking, and priority routing for safer roads.</p>
+            <div className="hero-buttons">
+              <Link to="/report" className="primary-btn">Report a Pothole</Link>
+              <Link to="/dashboard" className="secondary-btn">View Dashboard</Link>
+            </div>
+          </div>
+          <div className="hero-right">
+            <img src="/hero_illustration.png" alt="Smart Pothole Detection" className="hero-image" />
+          </div>
         </div>
       </section>
 

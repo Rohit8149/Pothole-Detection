@@ -35,24 +35,31 @@ function App() {
           {
             path: '/report',
             element: <Report/>
-          },
-          {
-            path: '/dashboard',
-            element: <Dashboard/>
-          },
-          {
-            path: '/field-officer/dashboard',
-            element: <FieldOfficerDashboard/>
-          },
-          {
-            path: '/field-officer/reports/:id',
-            element: <FieldReportDetail/>
-          },
-          {
-            path: '/supervisor/dashboard',
-            element: <SupervisorDashboard/>
           }
         ]
+      }
+    ]
+  },
+
+  // Dashboard Routes (with their own Layout/Sidebars)
+  {
+    element: <ProtectedRoute />,
+    children: [
+      {
+        path: '/dashboard',
+        element: <Dashboard/>
+      },
+      {
+        path: '/field-officer/dashboard',
+        element: <FieldOfficerDashboard/>
+      },
+      {
+        path: '/field-officer/reports/:id',
+        element: <FieldReportDetail/>
+      },
+      {
+        path: '/supervisor/dashboard',
+        element: <SupervisorDashboard/>
       }
     ]
   },

@@ -41,7 +41,7 @@ function Navbar() {
 
   return (
     <>
-      <AppBar position="sticky" color="background" elevation={1} sx={{ borderBottom: '1px solid', borderColor: 'divider' }}>
+      <AppBar position="sticky" elevation={0} sx={{ height: 64, backgroundColor: 'white', borderBottom: '1px solid #e2e8f0', justifyContent: 'center' }}>
         <Container maxWidth="xl">
           <Toolbar disableGutters sx={{ justifyContent: "space-between" }}>
             
@@ -64,12 +64,12 @@ function Navbar() {
                 to="/home"
                 style={({ isActive }) => ({
                   textDecoration: "none",
-                  color: isActive ? "#1976d2" : "inherit",
+                  color: isActive ? "#2563eb" : "#475569",
                   fontWeight: isActive ? 600 : 500,
-                  borderBottom: isActive ? "2px solid #1976d2" : "2px solid transparent",
-                  paddingBottom: 4,
-                  transition: 'all 0.2s'
+                  transition: 'color 0.2s'
                 })}
+                onMouseEnter={(e) => { if (e.target.style.color !== 'rgb(37, 99, 235)') e.target.style.color = '#0f172a'; }}
+                onMouseLeave={(e) => { if (!window.location.pathname.includes('/home')) e.target.style.color = '#475569'; }}
               >
                 Home
               </NavLink>
@@ -80,11 +80,9 @@ function Navbar() {
                     to="/report"
                     style={({ isActive }) => ({
                       textDecoration: "none",
-                      color: isActive ? "#1976d2" : "inherit",
+                      color: isActive ? "#2563eb" : "#475569",
                       fontWeight: isActive ? 600 : 500,
-                      borderBottom: isActive ? "2px solid #1976d2" : "2px solid transparent",
-                      paddingBottom: 4,
-                      transition: 'all 0.2s'
+                      transition: 'color 0.2s'
                     })}
                   >
                     Report
@@ -93,11 +91,9 @@ function Navbar() {
                     to="/dashboard"
                     style={({ isActive }) => ({
                       textDecoration: "none",
-                      color: isActive ? "#1976d2" : "inherit",
+                      color: isActive ? "#2563eb" : "#475569",
                       fontWeight: isActive ? 600 : 500,
-                      borderBottom: isActive ? "2px solid #1976d2" : "2px solid transparent",
-                      paddingBottom: 4,
-                      transition: 'all 0.2s'
+                      transition: 'color 0.2s'
                     })}
                   >
                     Dashboard

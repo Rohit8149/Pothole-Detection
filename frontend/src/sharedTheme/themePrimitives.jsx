@@ -86,10 +86,10 @@ export const getDesignTokens = () => {
       mode: "light",
 
       primary: {
-        light: brand[200],
-        main: brand[400],
-        dark: brand[700],
-        contrastText: brand[50],
+        light: "#60a5fa",
+        main: "#2563eb",
+        dark: "#1d4ed8",
+        contrastText: "#ffffff",
       },
 
       info: {
@@ -121,16 +121,16 @@ export const getDesignTokens = () => {
         ...gray,
       },
 
-      divider: alpha(gray[300], 0.4),
+      divider: "#e2e8f0",
 
       background: {
-        default: "hsl(220, 25%, 96%)",
+        default: "#f8fafc",
         paper: "#ffffff",
       },
 
       text: {
-        primary: gray[800],
-        secondary: gray[600],
+        primary: "#0f172a",
+        secondary: "#475569",
         warning: orange[400],
       },
 
@@ -147,7 +147,7 @@ export const getDesignTokens = () => {
 };
 
 export const typography = {
-  fontFamily: "Poppins, sans-serif",
+  fontFamily: "'Inter', sans-serif",
   h1: {
     fontSize: defaultTheme.typography.pxToRem(48),
     fontWeight: 600,
@@ -197,13 +197,13 @@ export const typography = {
 };
 
 export const shape = {
-  borderRadius: 8,
+  borderRadius: 6,
 };
 
 // Use index 1 for base shadow (matches MUI's elevation 1)
 const defaultShadows = [
   "none",
-  "var(--template-palette-baseShadow, hsla(220, 30%, 5%, 0.07) 0px 4px 16px 0px, hsla(220, 25%, 10%, 0.07) 0px 8px 16px -5px)",
+  "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
   ...defaultTheme.shadows.slice(2),
 ];
 export const shadows = defaultShadows;

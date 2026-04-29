@@ -58,15 +58,19 @@ export const surfacesCustomizations = {
 MuiCard: {
   styleOverrides: {
     root: ({ theme }) => ({
-      padding: 20,
+      padding: 24,
       display: 'flex',
       flexDirection: 'column',
       gap: 16,
-      transition: 'all 0.2s ease',
+      transition: 'transform 0.2s ease, box-shadow 0.2s ease',
       backgroundColor: '#ffffff',
-      borderRadius: 12,
-      border: `1px solid ${alpha(gray[200], 0.6)}`,
-      boxShadow: '0px 6px 20px rgba(0, 0, 0, 0.05)',
+      borderRadius: theme.shape.borderRadius,
+      border: '1px solid #e2e8f0',
+      boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+      '&:hover': {
+        transform: 'translateY(-2px)',
+        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+      },
 
       // Mobile spacing improvement
       [theme.breakpoints.down('sm')]: {
@@ -76,9 +80,13 @@ MuiCard: {
 
     // Optional: outlined variant
     outlined: {
-      border: `1px solid ${gray[300]}`,
+      border: '1px solid #e2e8f0',
       boxShadow: 'none',
       backgroundColor: '#ffffff',
+      '&:hover': {
+        transform: 'none',
+        boxShadow: 'none',
+      },
     },
   },
 },

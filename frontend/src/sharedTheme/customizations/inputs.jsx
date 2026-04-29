@@ -39,15 +39,15 @@ MuiButton: {
         {
           props: { size: 'small' },
           style: {
-            height: '2.25rem',
+            height: '32px',
             padding: '6px 12px',
-            fontSize: '0.8rem',
+            fontSize: '0.875rem',
           },
         },
         {
           props: { size: 'medium' },
           style: {
-            height: '2.5rem',
+            height: '40px',
             padding: '8px 16px',
           },
         },
@@ -57,14 +57,14 @@ MuiButton: {
           props: { color: 'primary', variant: 'contained' },
           style: {
             color: 'white',
-            backgroundColor: brand[400],
-            border: `1px solid ${brand[500]}`,
+            backgroundColor: theme.palette.primary.main,
+            border: `1px solid ${theme.palette.primary.main}`,
             '&:hover': {
-              backgroundColor: brand[500],
+              backgroundColor: theme.palette.primary.dark,
               boxShadow: '0px 4px 12px rgba(0,0,0,0.08)',
             },
             '&:active': {
-              backgroundColor: brand[600],
+              backgroundColor: theme.palette.primary.dark,
             },
           },
         },
@@ -74,9 +74,9 @@ MuiButton: {
           props: { color: 'secondary', variant: 'contained' },
           style: {
             color: 'white',
-            backgroundColor: brand[500],
+            backgroundColor: theme.palette.secondary?.main || '#475569',
             '&:hover': {
-              backgroundColor: brand[600],
+              backgroundColor: theme.palette.secondary?.dark || '#334155',
             },
           },
         },
@@ -85,11 +85,11 @@ MuiButton: {
         {
           props: { variant: 'outlined' },
           style: {
-            borderColor: gray[300],
+            borderColor: theme.palette.divider,
             backgroundColor: 'transparent',
             '&:hover': {
-              backgroundColor: gray[100],
-              borderColor: gray[400],
+              backgroundColor: theme.palette.action.hover,
+              borderColor: theme.palette.text.secondary,
             },
           },
         },
@@ -98,9 +98,9 @@ MuiButton: {
         {
           props: { variant: 'text' },
           style: {
-            color: gray[700],
+            color: theme.palette.text.primary,
             '&:hover': {
-              backgroundColor: gray[100],
+              backgroundColor: theme.palette.action.hover,
             },
           },
         },

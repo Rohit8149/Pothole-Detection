@@ -19,14 +19,16 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
   CircularProgress,
   Divider,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import { getFieldOfficerReports, updateReportStatus } from "../../services/roleApi";
+import Sidebar from "../common/Sidebar";
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
+import MapIcon from '@mui/icons-material/Map';
 
 const statusColors = {
   assigned: "warning",
@@ -96,30 +98,51 @@ const FieldOfficerDashboard = () => {
     return list;
   }, [reports, activeTab, severityFilter]);
 
-  return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" fontWeight={700} gutterBottom>
-          Assigned Reports
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Manage and update the status of pothole reports in your designated area.
-        </Typography>
-      </Box>
+  const sidebarItems = [
+    { id: 'assigned', label: `Assigned (${reports.filter(r => r.status === 'assigned').length})`, icon: <AssignmentIcon /> },
+    { id: 'in-progress', label: `In Progress (${reports.filter(r => r.status === 'in-progress').length})`, icon: <AutorenewIcon /> },
+    { id: 'completed', label: `Completed (${reports.filter(r => r.status === 'completed').length})`, icon: <DoneAllIcon /> },
+  ];
 
-      {/* Tabs */}
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-        <Tabs 
-          value={activeTab} 
-          onChange={(e, val) => { setActiveTab(val); setSeverityFilter(""); }}
-          variant="scrollable"
-          scrollButtons="auto"
-        >
-          <Tab icon={<AssignmentIcon />} iconPosition="start" label={`Assigned (${reports.filter(r => r.status === 'assigned').length})`} value="assigned" />
-          <Tab icon={<AutorenewIcon />} iconPosition="start" label={`In Progress (${reports.filter(r => r.status === 'in-progress').length})`} value="in-progress" />
-          <Tab icon={<DoneAllIcon />} iconPosition="start" label={`Completed (${reports.filter(r => r.status === 'completed').length})`} value="completed" />
-        </Tabs>
-      </Box>
+  const userInfo = {
+    name: 'Field Officer',
+    role: 'Staff Account',
+    avatarText: 'F',
+    avatarColor: 'secondary.main',
+  };
+
+  return (
+    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', bgcolor: (theme) => alpha(theme.palette.primary.main, 0.01) }}>
+      {/* Left Sidebar Component */}
+      <Sidebar 
+        menuItems={sidebarItems}
+        activeItem={activeTab}
+        onItemClick={(id) => { setActiveTab(id); setSeverityFilter(""); }}
+        userInfo={userInfo}
+      />
+
+      {/* Main Content Area */}
+      <Box sx={{ 
+        flexGrow: 1, 
+        height: '100vh', 
+        overflowY: 'auto', 
+        p: 4, 
+        boxSizing: 'border-box',
+        scrollbarWidth: 'none', /* Firefox */
+        msOverflowStyle: 'none', /* IE/Edge */
+        '&::-webkit-scrollbar': { display: 'none' } /* Chrome/Safari */
+      }}>
+        <Container maxWidth="xl" disableGutters>
+          <Box sx={{ mb: 4 }}>
+            <Typography variant="h4" fontWeight={800} gutterBottom sx={{ color: 'text.primary' }}>
+              {activeTab === 'assigned' && 'Assigned Tasks'}
+              {activeTab === 'in-progress' && 'Tasks In Progress'}
+              {activeTab === 'completed' && 'Completed Repairs'}
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Manage and update the status of pothole reports in your designated area.
+            </Typography>
+          </Box>
 
       {/* Controls */}
       <Box sx={{ mb: 4, display: 'flex', justifyContent: 'flex-end' }}>
@@ -149,31 +172,35 @@ const FieldOfficerDashboard = () => {
           <Typography variant="body1" color="text.secondary">No reports found in this section.</Typography>
         </Box>
       ) : (
-        <Grid container spacing={3}>
+        <Grid container spacing={4}>
           {tabReports.map((r) => (
             <Grid item xs={12} sm={6} md={4} key={r._id}>
-              <Card variant="outlined" sx={{ borderRadius: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                    <Typography variant="caption" sx={{ fontFamily: 'monospace', bgcolor: 'action.hover', px: 1, py: 0.5, borderRadius: 1 }}>
+              <Card variant="outlined" sx={{ borderRadius: 4, height: '100%', display: 'flex', flexDirection: 'column', boxShadow: '0 4px 20px rgba(0,0,0,0.02)', transition: 'transform 0.2s', '&:hover': { transform: 'translateY(-4px)' } }}>
+                <CardContent sx={{ flexGrow: 1, p: 3 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                    <Typography variant="caption" sx={{ fontFamily: 'monospace', bgcolor: 'action.hover', px: 1.5, py: 0.5, borderRadius: 2, fontWeight: 600 }}>
                       {r.report?.reportId || r._id.substring(0, 8)}
                     </Typography>
-                    <Chip label={statusLabels[r.status] || r.status} color={statusColors[r.status] || "default"} size="small" />
+                    <Chip 
+                      label={statusLabels[r.status] || r.status} 
+                      sx={{ bgcolor: (theme) => alpha(theme.palette[statusColors[r.status] || "default"].main, 0.1), color: (statusColors[r.status] || "default") + '.main', fontWeight: 600, borderRadius: 1.5 }} 
+                      size="small" 
+                    />
                   </Box>
-                  <Typography variant="h6" fontWeight={600} gutterBottom sx={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                  <Typography variant="h6" fontWeight={700} gutterBottom sx={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.3 }}>
                     {r.report?.location?.address || "Unknown Location"}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ textTransform: 'capitalize' }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ textTransform: 'capitalize', mb: 2, fontWeight: 500 }}>
                     Severity: {r.report?.severity || "NA"}
                   </Typography>
-                  <Typography variant="caption" color="text.disabled">
+                  <Typography variant="caption" color="text.disabled" fontWeight={500}>
                     Date: {r.report?.date ? new Date(r.report.date).toLocaleDateString() : "—"}
                   </Typography>
                 </CardContent>
                 <Divider />
-                <CardActions sx={{ p: 2, display: 'flex', justifyContent: 'space-between', gap: 1, flexWrap: 'wrap' }}>
-                  <Button size="small" variant="outlined" onClick={() => setSelectedReport(r)}>
-                    Details
+                <CardActions sx={{ p: 2, px: 3, bgcolor: (theme) => alpha(theme.palette.primary.main, 0.01), display: 'flex', justifyContent: 'space-between', gap: 1, flexWrap: 'wrap' }}>
+                  <Button size="small" variant="text" sx={{ fontWeight: 600 }} onClick={() => setSelectedReport(r)}>
+                    View Details
                   </Button>
                   <FormControl size="small" sx={{ minWidth: 140 }}>
                     <Select
@@ -181,6 +208,7 @@ const FieldOfficerDashboard = () => {
                       displayEmpty
                       disabled={updatingId === r._id}
                       onChange={(e) => handleStatusChange(r._id, e.target.value)}
+                      sx={{ borderRadius: 2, bgcolor: 'background.paper' }}
                     >
                       <MenuItem value="" disabled>Update Status</MenuItem>
                       {r.status !== "in-progress" && <MenuItem value="in-progress">In Progress</MenuItem>}
@@ -242,7 +270,9 @@ const FieldOfficerDashboard = () => {
           </>
         )}
       </Dialog>
-    </Container>
+        </Container>
+      </Box>
+    </Box>
   );
 };
 
